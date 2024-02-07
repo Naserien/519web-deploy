@@ -66,5 +66,5 @@ jobs:
         with:
           app-name: '519web'
           slot-name: 'Production'
-          package: .
+          package: '.'
           
