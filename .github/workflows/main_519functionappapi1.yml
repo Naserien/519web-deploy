@@ -7,8 +7,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "C_Sharp/API1/**"
   workflow_dispatch:
 
 env:
