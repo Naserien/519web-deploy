@@ -1,0 +1,33 @@
+name: Deploy Container App to Azure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "C_Sharp/API2/**"
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+    environment: production
+    permissions:
+      id-token: write #This is required for requesting the JWT
+
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.NEWSP }}
+      
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          appSourcePath: ${{ github.workspace }}/C_Sharp/API2
+          acrName: anotherrregistrynvm
+          containerAppName: ass2api2
+          resourceGroup: Azure subscription 1
