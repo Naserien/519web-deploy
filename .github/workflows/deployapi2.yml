@@ -30,4 +30,4 @@ jobs:
           appSourcePath: ${{ github.workspace }}/C_Sharp/API2
           acrName: anotherrregistrynvm
           containerAppName: ass2api2
-          resourceGroup: Azure subscription 1
+          resourceGroup: 519-ass2-api2
