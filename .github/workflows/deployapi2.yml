@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "C_Sharp/API2/**"
+      - "Node/API2/**"
   workflow_dispatch:
 
 jobs:
