@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 
 <PageTitle>Index</PageTitle>
 
@@ -6,4 +6,16 @@
 
 Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<p role="status">Secret from Key Vault: @secret</p>
+
+@code {
+    private string secret = "";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        
+        // Retrieve the secret using the EnvironmentHelper class
+        secret = EnvironmentHelper.GetEnvironmentVariable("Secret1");
+    }
+}
