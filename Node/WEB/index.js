@@ -16,11 +16,12 @@ const client = new SecretClient(keyVaultUrl, credential);
 app.use('/', express.static('frontend/build'));
 
 app.get('/api', async (req, res) => {
-res.send(`Secret Value: ${process.env.KVSecret1}`);
+    //res.send(`Secret Value: ${process.env.KVSecret1}`);
+    res.send('Hello, world!');
 });
 
 app.listen(port,() =>{
-  console.log('Server listening on port '+ port);
+     console.log('Server listening on port '+ port);
 });
 
 // const express = require('express');
