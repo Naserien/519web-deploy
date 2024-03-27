@@ -58,6 +58,9 @@ namespace API1
             // Retrieve the second secret from environment variable
             string secret2 = EnvironmentHelper.GetEnvironmentVariable("Secret2");
 
+            // Log the value of secret2
+            log.LogInformation($"Value of Secret 2: {secret2}");
+            
             string name = req.Query["name"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
