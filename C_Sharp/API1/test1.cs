@@ -55,11 +55,8 @@ namespace API1
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            // Retrieve the first secret from environment variable
-            string secret1 = EnvironmentHelper.GetEnvironmentVariable("SECRET_NAME_1");
-
             // Retrieve the second secret from environment variable
-            string secret2 = EnvironmentHelper.GetEnvironmentVariable("SECRET_NAME_2");
+            string secret2 = EnvironmentHelper.GetEnvironmentVariable("Secret2");
 
             string name = req.Query["name"];
 
@@ -69,8 +66,8 @@ namespace API1
 
             string todayDate = DateTime.Today.ToString("yyyy-MM-dd");
             string responseMessage = string.IsNullOrEmpty(name)
-                ? $"This HTTP triggered function executed successfully on {todayDate}. Pass a name in the query string or in the request body for a personalized response. Secret 1: {secret1}, Secret 2: {secret2}"
-                : $"Hello, {name}. This HTTP triggered function executed successfully on {todayDate}. Secret 1: {secret1}, Secret 2: {secret2}";
+                ? $"This HTTP triggered function executed successfully on {todayDate}. Pass a name in the query string or in the request body for a personalized response. Secret 2: {secret2}"
+                : $"Hello, {name}. This HTTP triggered function executed successfully on {todayDate}. Secret 2: {secret2}";
 
             return new OkObjectResult(responseMessage);
         }
