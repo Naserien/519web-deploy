@@ -43,8 +43,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
 
 namespace API1
 {
@@ -57,8 +55,11 @@ namespace API1
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            // Retrieve the second secret from Key Vault
-            string secret2 = await GetSecretFromKeyVault("Secret2", log);
+            // Retrieve the first secret from environment variable
+            string secret1 = EnvironmentHelper.GetEnvironmentVariable("SECRET_NAME_1");
+
+            // Retrieve the second secret from environment variable
+            string secret2 = EnvironmentHelper.GetEnvironmentVariable("SECRET_NAME_2");
 
             string name = req.Query["name"];
 
@@ -73,24 +74,6 @@ namespace API1
 
             return new OkObjectResult(responseMessage);
         }
-
-        // Function to retrieve secrets from Key Vault
-        private static async Task<string> GetSecretFromKeyVault(string secretName, ILogger log)
-        {
-            string keyVaultUrl = "https://naserienkv1.vault.azure.net/"; // Replace with your Key Vault URL
-            var azureServiceTokenProvider = new AzureServiceTokenProvider();
-            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-
-            try
-            {
-                var secret = await keyVaultClient.GetSecretAsync($"{keyVaultUrl}secrets/{secretName}");
-                return secret.Value;
-            }
-            catch (Exception ex)
-            {
-                log.LogError($"Failed to retrieve secret '{secretName}' from Key Vault: {ex.Message}");
-                return null;
-            }
-        }
     }
 }
+
