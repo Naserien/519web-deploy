@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: assign1node # set this to your application's name
+  AZURE_WEBAPP_NAME: 519webnode # set this to your application's name
   WEBAPP_PACKAGE_PATH: 'Node/WEB' # set this to the path to your web app project, defaults to the repository root
   FRONTEND_PACKAGE_PATH: 'Node/WEB/frontend' # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '18.x' # set this to the node version to use
