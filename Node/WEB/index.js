@@ -6,8 +6,8 @@ const {SecretClient} = require('@azure/keyvault-secrets');
 
 const port = process.env.PORT || 3000
 
-const keyVaultName = "naserienkv1"
-const keyVaultUrl ='https://${keyVaultName}.vault.azure.net/';
+const keyVaultName = "naserienkv1";
+const keyVaultUrl =`https://${keyVaultName}.vault.azure.net/`;
 const secretName = "Secret1";
 
 const credential = new DefaultAzureCredential();
