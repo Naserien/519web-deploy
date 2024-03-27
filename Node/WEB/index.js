@@ -16,7 +16,7 @@ const client = new SecretClient(keyVaultUrl, credential);
 app.use('/', express.static('frontend/build'));
 
 app.get('/api', async (req, res) => {
-res.send('Secret Value: ${process.env.KVsecret1H }');
+res.send(`Secret Value: ${process.env.KVSecret1}`);
 });
 
 app.listen(port,() =>{
