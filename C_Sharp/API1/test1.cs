@@ -51,6 +51,7 @@ namespace API1
         [FunctionName("test1")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [Queue("api1", Connection = "AzureWebJobsStorage")] IAsyncCollector<string> queueCollector,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -60,7 +61,13 @@ namespace API1
 
             // Log the value of secret2
             log.LogInformation($"Value of Secret 2: {secret2}");
-            
+
+            // Generate a message to be inserted into the queue
+            string message = $"Value of Secret 2: {secret2}";
+
+            // Add the message to the storage queue
+            await queueCollector.AddAsync(message);
+
             string name = req.Query["name"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -69,8 +76,8 @@ namespace API1
 
             string todayDate = DateTime.Today.ToString("yyyy-MM-dd");
             string responseMessage = string.IsNullOrEmpty(name)
-                ? $"This HTTP triggered function executed successfully on {todayDate}. Pass a name in the query string or in the request body for a personalized response. Secret 2: {secret2}"
-                : $"Hello, {name}. This HTTP triggered function executed successfully on {todayDate}. Secret 2: {secret2}";
+                ? $"This HTTP triggered function executed successfully on {todayDate}. Pass a name in the query string or in the request body for a personalized response. Message added to queue."
+                : $"Hello, {name}. This HTTP triggered function executed successfully on {todayDate}. Message added to queue.";
 
             return new OkObjectResult(responseMessage);
         }
