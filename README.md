@@ -2,7 +2,7 @@
 
 # Application Architecture Overview
 
-[![Solution Diagram](Solution Diagram.jpg)]
+![Solution Diagram.jpg](https://github.com/Naserien/519web-deploy/blob/main/Solution%20Diagram.jpg)
 
 ### Components:
 
