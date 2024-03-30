@@ -2,7 +2,7 @@
 
 # Application Architecture Overview
 
-![Solution Diagram](Solution Diagram.jpg)
+[![Solution Diagram](Solution Diagram.jpg)]
 
 ### Components:
 
