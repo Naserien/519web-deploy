@@ -15,22 +15,29 @@
 - **Function App**: A serverless compute service that runs event-triggered code, which does not require managing infrastructure.
 
 - **Web App**: The interface for users, potentially a front-end service like WordPress, interacting with the Container App and Function App.
+  
+- **Key Vault**: Secures sensitive information such as secrets, tokens, and certificates required by the Container App, Function App, and Web App.
+  
+- **Storage Queue**: Manages communication between services asynchronously, mainly used for processing tasks queued by the Function App.
 
-- **Resource Group**: In Azure, it's a collection that holds related resources for an Azure solution, including the Web App and Function App.
+- **Resource Group**: In Azure, it's a collection that holds related resources for an Azure solution, including the Web App, Function App and Container app.
 
 - **Users**: The end-users accessing the Web App.
 
-### Data Flow:
+### Data Flow
 
-1. **Code Push & CI/CD Trigger**: Developers push updates to GitHub, initiating the GitHub Workflows.
+1. **Code Push & CI/CD Trigger**: Developers push code to GitHub, triggering the GitHub Workflows for CI/CD.
 
-2. **Build & Image Push**: A Docker image is created and pushed to the Container Registry.
+2. **Build & Image Push**: Builds a Docker image and pushes it to the Container Registry.
 
-3. **Deployment**: The image is deployed to the Container App, and the Function App is set up to handle backend tasks.
+3. **Deployment**: Deploys the Docker image to the Container App and configures the Function App and Key Vault.
 
-4. **User Interaction**: Users interact with the Web App, which uses the other apps to serve content and perform actions.
+4. **Service Interaction**:
+   - The Web App communicates with the Container App to serve content.
+   - The Function App may place tasks in the Storage Queue.
+   - The Container App may process tasks or messages from the Storage Queue.
 
-5. **Resource Management**: All services are contained within an Azure Resource Group for easy management.
+5. **Resource Management**: All services are managed within an Azure Resource Group for centralized governance.
 
 ### Notations:
 
@@ -38,14 +45,14 @@
 
 ## Getting Started
 
-To begin working with the application:
+To work with this application architecture:
 
-1. **Permissions**: Ensure access to the GitHub repository, Container Registry, and Azure Resource Group.
+1. **Permissions**: Verify access to the GitHub repository, Container Registry, Key Vault, Storage Queue, and Azure Resource Group.
 
-2. **Local Development**: Clone the repository and set up your local environment as per the project's guidelines.
+2. **Local Development**: Clone the repository and set up your local environment following the project's guidelines.
 
-3. **Deployment**: Refer to the GitHub Workflows for instructions on the CI/CD processes.
+3. **Deployment**: Use the GitHub Workflows documentation for CI/CD guidance. Securely manage your environment variables and secrets in Key Vault.
 
-4. **Monitoring & Maintenance**: Post-deployment, use Azure's monitoring services to keep track of application performance and health, updating code and dependencies when necessary.
+4. **Monitoring & Maintenance**: After deployment, monitor application health with Azure's services. Storage Queue insights will inform on job statuses and potential issues.
 
 For a detailed breakdown of each component, refer to the Azure's service documentation.
