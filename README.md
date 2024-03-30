@@ -2,6 +2,8 @@
 
 # Application Architecture Overview
 
+![Solution Diagram](Solution Diagram.jpg)
+
 ### Components:
 
 - **GitHub Workflows**: Automates the deployment process through CI/CD pipelines using GitHub Actions. It handles tasks such as building, testing, and deploying the application.
