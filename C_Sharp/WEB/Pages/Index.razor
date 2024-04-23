@@ -27,24 +27,29 @@
     }
 
     private async Task UploadFiles()
+{
+    foreach (var file in uploadedFiles)
     {
-        foreach (var file in uploadedFiles)
+        var content = new MultipartFormDataContent();
+        var stream = file.OpenReadStream(10485760); // 10 MB limit here
+        var fileContent = new StreamContent(stream);
+
+        content.Add(fileContent, "\"file\"", $"\"{file.Name}\"");
+
+        var response = await httpClient.PostAsync("api/API1", content);
+
+        if (response.IsSuccessStatusCode)
         {
-            var content = new MultipartFormDataContent();
-            var fileContent = new StreamContent(file.OpenReadStream(maxFileSize: 10485760)); // set a limit to file size (10MB here)
-
-            content.Add(fileContent, "\"file\"", $"\"{file.Name}\"");
-
-            var response = await httpClient.PostAsync("api/API1", content);
-
-            if (response.IsSuccessStatusCode)
-            {
-                // Handle the response accordingly.
-            }
-            else
-            {
-                // Error handling
-            }
+            // Handle the response accordingly.
         }
+        else
+        {
+            // Error handling
+        }
+
+        // Make sure to dispose the stream after use
+        await stream.DisposeAsync();
     }
+}
+
 }
