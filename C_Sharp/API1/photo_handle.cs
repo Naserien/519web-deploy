@@ -98,9 +98,9 @@ using Newtonsoft.Json;
 
 namespace API1
 {
-    public static class test1
+    public static class photoprocess
     {
-        [FunctionName("test1")]
+        [FunctionName("photoprocess")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             [Queue("api1", Connection = "AzureWebJobsStorage")] IAsyncCollector<string> queueCollector,
