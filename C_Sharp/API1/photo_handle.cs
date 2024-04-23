@@ -62,9 +62,9 @@ using Newtonsoft.Json;
 
 namespace API1
 {
-    public static class test1
+    public static class photo_handle
     {
-        [FunctionName("test1")]
+        [FunctionName("photo_handle")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
