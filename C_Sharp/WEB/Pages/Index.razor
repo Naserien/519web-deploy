@@ -1,32 +1,66 @@
 @page "/"
 
-<PageTitle>Photo Upload</PageTitle>
+<PageTitle>Naserien's Photo App</PageTitle>
 
-<h1>Welcome to the Photo Library!</h1>
-
-<p>Select photos to upload:</p>
+<h1>Naserien's Photo App</h1>
 
 <InputFile OnChange="@OnInputFileChange" multiple />
 
-@if (uploadedFiles.Any())
+@if (images.Any())
 {
-    <h3>Files to upload:</h3>
-    <ul>
-    @foreach (var file in uploadedFiles)
-    {
-        <li>@file.Name</li>
-    }
-    </ul>
+    <div class="photo-grid">
+        @foreach (var image in images)
+        {
+            <div class="photo-entry">
+                <img src="@image.Url" alt="@image.Description" />
+                <p>@image.Description</p>
+            </div>
+        }
+    </div>
 }
 
 @code {
-    private List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
+    private List<ImageItem> images = new List<ImageItem>();
 
+    // Placeholder method to simulate file upload and image loading
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
-        uploadedFiles.AddRange(e.GetMultipleFiles());
-        // You would process file uploads here
-        // For now, we just add them to the list to display
+        var files = e.GetMultipleFiles();
+        foreach (var file in files)
+        {
+            // Here you would upload the file and get back the URL and description
+            // For demo purposes, we are adding a placeholder item
+            images.Add(new ImageItem
+            {
+                Url = "path/to/image", // Replace with actual image URL after uploading
+                Description = file.Name
+            });
+        }
+    }
+
+    private class ImageItem
+    {
+        public string Url { get; set; }
+        public string Description { get; set; }
     }
 }
 
+<style>
+    .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .photo-entry {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .photo-entry img {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
