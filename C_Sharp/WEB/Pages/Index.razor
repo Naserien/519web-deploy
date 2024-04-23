@@ -1,66 +1,50 @@
 @page "/"
 
-<PageTitle>Naserien's Photo App</PageTitle>
+<PageTitle>Photo Upload</PageTitle>
 
-<h1>Naserien's Photo App</h1>
+<h1>Welcome to the Photo Library!</h1>
 
 <InputFile OnChange="@OnInputFileChange" multiple />
 
-@if (images.Any())
+@if (uploadedFiles.Any())
 {
-    <div class="photo-grid">
-        @foreach (var image in images)
-        {
-            <div class="photo-entry">
-                <img src="@image.Url" alt="@image.Description" />
-                <p>@image.Description</p>
-            </div>
-        }
-    </div>
+    <button @onclick="UploadFiles">Upload</button>
+    <ul>
+    @foreach (var file in uploadedFiles)
+    {
+        <li>@file.Name</li>
+    }
+    </ul>
 }
 
 @code {
-    private List<ImageItem> images = new List<ImageItem>();
+    private List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
+    private readonly HttpClient httpClient = new HttpClient(); // This should actually be injected
 
-    // Placeholder method to simulate file upload and image loading
-    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    private void OnInputFileChange(InputFileChangeEventArgs e)
     {
-        var files = e.GetMultipleFiles();
-        foreach (var file in files)
+        uploadedFiles.AddRange(e.GetMultipleFiles());
+    }
+
+    private async Task UploadFiles()
+    {
+        foreach (var file in uploadedFiles)
         {
-            // Here you would upload the file and get back the URL and description
-            // For demo purposes, we are adding a placeholder item
-            images.Add(new ImageItem
+            var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(file.OpenReadStream(maxFileSize: 10485760)); // set a limit to file size (10MB here)
+
+            content.Add(fileContent, "\"file\"", $"\"{file.Name}\"");
+
+            var response = await httpClient.PostAsync("api/API1", content);
+
+            if (response.IsSuccessStatusCode)
             {
-                Url = "path/to/image", // Replace with actual image URL after uploading
-                Description = file.Name
-            });
+                // Handle the response accordingly.
+            }
+            else
+            {
+                // Error handling
+            }
         }
     }
-
-    private class ImageItem
-    {
-        public string Url { get; set; }
-        public string Description { get; set; }
-    }
 }
-
-<style>
-    .photo-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 10px;
-        padding: 10px;
-    }
-
-    .photo-entry {
-        border: 1px solid #ccc;
-        padding: 10px;
-        text-align: center;
-    }
-
-    .photo-entry img {
-        max-width: 100%;
-        height: auto;
-    }
-</style>
