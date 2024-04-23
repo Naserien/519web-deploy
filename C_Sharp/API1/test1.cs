@@ -35,14 +35,18 @@
 //     }
 // }
 using System;
-using Microsoft.Azure.Functions.Worker;
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
-public class QueueFunction
+namespace API1
 {
-    private readonly ILogger<QueueFunction> _logger;
-
-    public QueueFunction(ILogger<QueueFunction> logger)
+    public static class test1
     {
         [FunctionName("test1")]
         public static async Task<IActionResult> Run(
@@ -77,11 +81,7 @@ public class QueueFunction
 
             return new OkObjectResult(responseMessage);
         }
-
-        // Queue Output messages
-        return messages;
     }
 }
-
 
 
