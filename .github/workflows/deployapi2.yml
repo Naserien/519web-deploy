@@ -24,6 +24,12 @@ jobs:
         with:
           creds: ${{ secrets.NEWSP2 }}
       
+      - name: Set environment variables
+        run: |
+          echo "SECRET3=${{ secrets.secret3 }}" >> $GITHUB_ENV
+          echo "AZURE_STORAGE_CONNECTION_STRING=${{ secrets.jobstorage }}" >> $GITHUB_ENV
+          # Add more secrets as needed
+
       - name: Build and deploy Container App
         uses: azure/container-apps-deploy-action@v1
         with:

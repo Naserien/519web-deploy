@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿<!-- @page "/"
 
 <PageTitle>Index</PageTitle>
 
@@ -6,4 +6,58 @@
 
 Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<SurveyPrompt Title="How is Blazor working for you?" /> -->
+
+<!-- @page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<p role="status">Secret from Key Vault: @secret</p>
+
+@code {
+    private string secret = "";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        
+        // Retrieve the secret using the EnvironmentHelper class
+        secret = EnvironmentHelper.GetEnvironmentVariable("Secret1");
+    }
+} -->
+
+@page "/"
+
+<PageTitle>Photo Upload</PageTitle>
+
+<h1>Welcome to the Photo Library!</h1>
+
+<p>Select photos to upload:</p>
+
+<InputFile OnChange="@OnInputFileChange" multiple />
+
+@if (uploadedFiles.Any())
+{
+    <h3>Files to upload:</h3>
+    <ul>
+    @foreach (var file in uploadedFiles)
+    {
+        <li>@file.Name</li>
+    }
+    </ul>
+}
+
+@code {
+    private List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        uploadedFiles.AddRange(e.GetMultipleFiles());
+        // You would process file uploads here
+        // For now, we just add them to the list to display
+    }
+}
