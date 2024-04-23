@@ -9,81 +9,47 @@
 @if (uploadedFiles.Any())
 {
     <button @onclick="UploadFiles">Upload</button>
+    <ul>
+    @foreach (var file in uploadedFiles)
+    {
+        <li>@file.Name</li>
+    }
+    </ul>
 }
-
-@if (!string.IsNullOrEmpty(uploadStatus))
-{
-    <p class="@statusClass">@uploadStatus</p>
-}
-
-<ul>
-@foreach (var file in uploadedFiles)
-{
-    <li>@file.Name</li>
-}
-</ul>
 
 @code {
     private List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
-    private string uploadStatus = "";
-    private string statusClass = "";
-    @inject HttpClient httpClient;
+    private readonly HttpClient httpClient = new HttpClient(); // This should actually be injected
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
         uploadedFiles.AddRange(e.GetMultipleFiles());
-        uploadStatus = ""; // Reset the status message when new files are selected
-        statusClass = "";
     }
 
     private async Task UploadFiles()
+{
+    foreach (var file in uploadedFiles)
     {
-        foreach (var file in uploadedFiles)
+        var content = new MultipartFormDataContent();
+        var stream = file.OpenReadStream(10485760); // 10 MB limit here
+        var fileContent = new StreamContent(stream);
+
+        content.Add(fileContent, "\"file\"", $"\"{file.Name}\"");
+
+        var response = await httpClient.PostAsync("api/API1", content);
+
+        if (response.IsSuccessStatusCode)
         {
-            var content = new MultipartFormDataContent();
-            var stream = file.OpenReadStream(10485760); // Apply the file size limit of 10 MB here
-            var fileContent = new StreamContent(stream);
-
-            content.Add(fileContent, "file", file.Name);
-
-            try
-            {
-                var functionUrl = Environment.GetEnvironmentVariable("photo_process_url");
-                var response = await httpClient.PostAsync(functionUrl, content);
-                
-                if (response.IsSuccessStatusCode)
-                {
-                    // Handle the success scenario
-                    uploadStatus = "Upload successful!";
-                    statusClass = "success";
-                }
-                else
-                {
-                    // Handle the failure scenario
-                    uploadStatus = "Upload failed. Please try again.";
-                    statusClass = "error";
-                }
-            }
-            catch (HttpRequestException e)
-            {
-                // Handle network-related exception
-                uploadStatus = $"Error: {e.Message}";
-                statusClass = "error";
-            }
-            finally
-            {
-                // Always dispose the stream
-                await stream.DisposeAsync();
-            }
+            // Handle the response accordingly.
         }
+        else
+        {
+            // Error handling
+        }
+
+        // Make sure to dispose the stream after use
+        await stream.DisposeAsync();
     }
 }
 
-<style>
-    .success {
-        color: green;
-    }
-    .error {
-        color: red;
-    }
-</style>
+}
