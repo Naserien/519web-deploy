@@ -37,3 +37,4 @@ jobs:
           acrName: ass2containerapp
           containerAppName: ass2containerapp
           resourceGroup: 519-ass2-api2
+          environmentVariables: jobstorage=secretref:jobstorage secret3=secretref:secret3
