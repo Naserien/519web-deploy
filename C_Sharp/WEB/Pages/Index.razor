@@ -6,7 +6,11 @@
 
 <InputFile OnChange="@OnInputFileChange" multiple />
 
-@if (uploadedFiles.Any())
+@if (uploading)
+{
+    <p>Uploading...</p>
+}
+else if (uploadedFiles.Any())
 {
     <button @onclick="UploadFiles">Upload</button>
     <ul>
@@ -17,43 +21,75 @@
     </ul>
 }
 
+@if (!string.IsNullOrEmpty(uploadResultMessage))
+{
+    <p class="@resultMessageClass">@uploadResultMessage</p>
+}
+
 @code {
     private List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
-    private readonly HttpClient httpClient = new HttpClient(); // This should actually be injected
-    @inject IConfiguration Configuration; // Inject the IConfiguration service
+    private string uploadResultMessage = "";
+    private string resultMessageClass = "";
+    private bool uploading = false;
+    
+    @inject IConfiguration Configuration;
+    @inject HttpClient httpClient; // Ensure HttpClient is injected via DI
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
         uploadedFiles.AddRange(e.GetMultipleFiles());
+        uploadResultMessage = ""; // Clear any previous messages
     }
 
     private async Task UploadFiles()
     {
-        var photoProcessUrl = Configuration["photo_process_url"]; // Read the Function URL from the configuration
+        uploading = true;
+        var photoProcessUrl = Configuration["photo_process_url"];
 
         foreach (var file in uploadedFiles)
         {
             var content = new MultipartFormDataContent();
-            var stream = file.OpenReadStream(10485760); // 10 MB limit here
+            var stream = file.OpenReadStream(10485760); // Set a limit to file size (10MB here)
             var fileContent = new StreamContent(stream);
 
-            content.Add(fileContent, "\"file\"", $"\"{file.Name}\"");
+            content.Add(fileContent, "file", file.Name);
 
-            var response = await httpClient.PostAsync(photoProcessUrl, content); // Use the Function URL
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                // Handle the response accordingly.
-            }
-            else
-            {
-                // Error handling
-            }
+                var response = await httpClient.PostAsync(photoProcessUrl, content);
 
-            // Make sure to dispose the stream after use
-            await stream.DisposeAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    uploadResultMessage = $"{file.Name} uploaded successfully!";
+                    resultMessageClass = "success";
+                }
+                else
+                {
+                    uploadResultMessage = $"{file.Name} failed to upload.";
+                    resultMessageClass = "error";
+                }
+            }
+            catch (Exception ex)
+            {
+                uploadResultMessage = $"Error: {ex.Message}";
+                resultMessageClass = "error";
+            }
+            finally
+            {
+                await stream.DisposeAsync();
+            }
         }
+
+        uploading = false;
+        uploadedFiles.Clear(); // Optionally clear the list after upload
     }
 }
 
-
+<style>
+    .success {
+        color: green;
+    }
+    .error {
+        color: red;
+    }
+</style>

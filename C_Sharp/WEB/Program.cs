@@ -9,6 +9,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
+// Register HttpClient as Scoped for dependency injection
+builder.Services.AddScoped<HttpClient>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
