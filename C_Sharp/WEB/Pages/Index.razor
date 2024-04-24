@@ -1,4 +1,6 @@
 @page "/"
+@inject IConfiguration Configuration
+@inject HttpClient httpClient
 
 <PageTitle>Photo Upload</PageTitle>
 
@@ -27,7 +29,13 @@
     private List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
     private string uploadStatus = "";
     private string statusClass = "";
-    @inject HttpClient httpClient;
+    private string apiUrl;
+
+    protected override void OnInitialized()
+    {
+        apiUrl = Configuration["photo_process_url"];
+        base.OnInitialized();
+    }
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
@@ -48,9 +56,8 @@
 
             try
             {
-                var functionUrl = Environment.GetEnvironmentVariable("photo_process_url");
-                var response = await httpClient.PostAsync(functionUrl, content);
-                
+                var response = await httpClient.PostAsync(apiUrl, content);
+
                 if (response.IsSuccessStatusCode)
                 {
                     // Handle the success scenario
@@ -76,6 +83,8 @@
                 await stream.DisposeAsync();
             }
         }
+
+        uploadedFiles.Clear(); // Clear the list after all files are processed
     }
 }
 
