@@ -12,7 +12,7 @@ public class Startup
     {
         services.AddRazorPages();
         services.AddServerSideBlazor();
-        services.AddSingleton<WeatherForecastService>();
+        //services.AddSingleton<WeatherForecastService>();
 
         // Register HttpClient as Scoped for dependency injection
         services.AddScoped<HttpClient>();
