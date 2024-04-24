@@ -31,9 +31,13 @@
     private string statusClass = "";
     private string apiUrl;
 
+    // Inject the HttpClient service provided by Blazor
+    [Inject]
+    private HttpClient HttpClient { get; set; }
+
     protected override void OnInitialized()
     {
-        apiUrl = Configuration["photo_process_url"];
+        apiUrl = Configuration["photo_process_url"]; // Ensure this is set in your configuration
         base.OnInitialized();
     }
 
@@ -49,42 +53,40 @@
         foreach (var file in uploadedFiles)
         {
             var content = new MultipartFormDataContent();
-            var stream = file.OpenReadStream(10485760); // Apply the file size limit of 10 MB here
+            var stream = file.OpenReadStream(maxFileSize: 10485760); // 10 MB size limit
             var fileContent = new StreamContent(stream);
-
             content.Add(fileContent, "file", file.Name);
 
             try
             {
-                var response = await httpClient.PostAsync(apiUrl, content);
+                var response = await HttpClient.PostAsync(apiUrl, content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // Handle the success scenario
                     uploadStatus = "Upload successful!";
                     statusClass = "success";
                 }
                 else
                 {
-                    // Handle the failure scenario
                     uploadStatus = "Upload failed. Please try again.";
                     statusClass = "error";
                 }
             }
             catch (HttpRequestException e)
             {
-                // Handle network-related exception
                 uploadStatus = $"Error: {e.Message}";
                 statusClass = "error";
             }
             finally
             {
-                // Always dispose the stream
-                await stream.DisposeAsync();
+                await stream.DisposeAsync(); // Dispose of the stream after use
             }
-        }
 
-        uploadedFiles.Clear(); // Clear the list after all files are processed
+            // Clear the uploaded files list and reset status
+            uploadedFiles.Clear();
+            uploadStatus = ""; 
+            statusClass = "";
+        }
     }
 }
 
