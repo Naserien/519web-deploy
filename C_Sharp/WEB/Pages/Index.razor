@@ -1,4 +1,5 @@
 @page "/"
+
 @inject IConfiguration Configuration
 @inject HttpClient httpClient
 
@@ -11,41 +12,26 @@
 @if (uploadedFiles.Any())
 {
     <button @onclick="UploadFiles">Upload</button>
+    <ul>
+    @foreach (var file in uploadedFiles)
+    {
+        <li>@file.Name</li>
+    }
+    </ul>
 }
-
-@if (!string.IsNullOrEmpty(uploadStatus))
-{
-    <p class="@statusClass">@uploadStatus</p>
-}
-
-<ul>
-@foreach (var file in uploadedFiles)
-{
-    <li>@file.Name</li>
-}
-</ul>
 
 @code {
     private List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
-    private string uploadStatus = "";
-    private string statusClass = "";
     private string apiUrl;
-
-    // Inject the HttpClient service provided by Blazor
-    [Inject]
-    private HttpClient HttpClient { get; set; }
 
     protected override void OnInitialized()
     {
-        apiUrl = Configuration["photo_process_url"]; // Ensure this is set in your configuration
-        base.OnInitialized();
+        apiUrl = Configuration["photo_process_url"];
     }
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
         uploadedFiles.AddRange(e.GetMultipleFiles());
-        uploadStatus = ""; // Reset the status message when new files are selected
-        statusClass = "";
     }
 
     private async Task UploadFiles()
@@ -53,48 +39,33 @@
         foreach (var file in uploadedFiles)
         {
             var content = new MultipartFormDataContent();
-            var stream = file.OpenReadStream(maxFileSize: 10485760); // 10 MB size limit
-            var fileContent = new StreamContent(stream);
+            using var stream = file.OpenReadStream(10485760); // 10 MB limit here
+            using var fileContent = new StreamContent(stream);
             content.Add(fileContent, "file", file.Name);
 
             try
             {
-                var response = await HttpClient.PostAsync(apiUrl, content);
+                var response = await httpClient.PostAsync(apiUrl, content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    uploadStatus = "Upload successful!";
-                    statusClass = "success";
+                    // Handle the response accordingly, maybe indicating success to the user.
                 }
                 else
                 {
-                    uploadStatus = "Upload failed. Please try again.";
-                    statusClass = "error";
+                    // Error handling, maybe indicating the failure to the user.
                 }
             }
-            catch (HttpRequestException e)
+            catch (HttpRequestException ex)
             {
-                uploadStatus = $"Error: {e.Message}";
-                statusClass = "error";
+                // Log and handle the network-related exception
             }
             finally
             {
-                await stream.DisposeAsync(); // Dispose of the stream after use
+                // The stream is already disposed by the 'using' statement
             }
-
-            // Clear the uploaded files list and reset status
-            uploadedFiles.Clear();
-            uploadStatus = ""; 
-            statusClass = "";
         }
+
+        uploadedFiles.Clear(); // Clear the list after processing all files
     }
 }
-
-<style>
-    .success {
-        color: green;
-    }
-    .error {
-        color: red;
-    }
-</style>
