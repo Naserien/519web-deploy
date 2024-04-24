@@ -19,7 +19,7 @@
 
 @code {
     private List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
-    @inject HttpClient httpClient;
+    private readonly HttpClient httpClient = new HttpClient(); // This should actually be injected
     @inject IConfiguration Configuration; // Inject the IConfiguration service
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
