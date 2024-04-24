@@ -45,6 +45,26 @@ else if (uploadedFiles.Any())
     {
         uploading = true;
         var photoProcessUrl = Configuration["photo_process_url"];
+        var photoUrl = Environment.GetEnvironmentVariable("photo_process_url");
+        // 检查环境变量是否已设置
+        if (photoUrl != null)
+        {
+            Console.WriteLine("Photo URL: " + photoUrl);
+        }
+        else
+        {
+            Console.WriteLine("Environment variable 'photo_url' is not set.");
+        }
+
+        if (photoProcessUrl != null)
+        {
+            Console.WriteLine("photoProcessUrl: " + photoUrl);
+        }
+        else
+        {
+            Console.WriteLine("Environment variable 'photoProcessUrl' is not set.");
+        }
+
 
         foreach (var file in uploadedFiles)
         {
