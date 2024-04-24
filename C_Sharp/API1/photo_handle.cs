@@ -1,88 +1,88 @@
-// using System.IO;
-// using Microsoft.AspNetCore.Mvc;
-// using Microsoft.Azure.WebJobs;
-// using Microsoft.Azure.WebJobs.Extensions.Http;
-// using Microsoft.AspNetCore.Http;
-// using Microsoft.Extensions.Logging;
-// using Microsoft.WindowsAzure.Storage.Blob;
-// using System.Threading.Tasks;
-// using System;
-// using System.Linq;
-
-// public static class PhotoHandleFunction
-// {
-//     [FunctionName("PhotoHandle")]
-//     public static async Task<IActionResult> Run(
-//         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
-//         [Blob("photos", FileAccess.Write, Connection = "AzureWebJobsStorage")] CloudBlobContainer container,
-//         [Queue("photoprocess", Connection = "AzureWebJobsStorage")] IAsyncCollector<string> messageCollector,
-//         ILogger log)
-//     {
-//         log.LogInformation("Received a photo upload request.");
-
-//         // Check if the container exists and create if it does not
-//         await container.CreateIfNotExistsAsync();
-
-//         // Assuming the file is sent as a form-data with a 'file' key
-//         var file = req.Form.Files.GetFile("file");
-//         if (file == null)
-//         {
-//             return new BadRequestObjectResult("Please upload a file.");
-//         }
-
-//         // Generate a unique name for the blob
-//         string blobName = $"{Guid.NewGuid()}-{file.FileName}";
-//         var blockBlob = container.GetBlockBlobReference(blobName);
-
-//         // Upload the file to the blob
-//         using (var stream = file.OpenReadStream())
-//         {
-//             await blockBlob.UploadFromStreamAsync(stream);
-//         }
-
-//         log.LogInformation($"Uploaded blob '{blobName}' to container '{container.Name}'.");
-
-//         // Insert a message into the queue to process this blob later
-//         await messageCollector.AddAsync(blobName);
-//         log.LogInformation($"Enqueued blob name '{blobName}' for further processing.");
-
-//         return new OkObjectResult($"File uploaded successfully: {blobName}");
-//     }
-// }
-
-using System;
 using System.IO;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using Microsoft.WindowsAzure.Storage.Blob;
+using System.Threading.Tasks;
+using System;
+using System.Linq;
 
-namespace API1
+public static class PhotoHandleFunction
 {
-    public static class photo_handle
+    [FunctionName("PhotoHandle")]
+    public static async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+        [Blob("photos", FileAccess.Write, Connection = "AzureWebJobsStorage")] CloudBlobContainer container,
+        [Queue("photoprocess", Connection = "AzureWebJobsStorage")] IAsyncCollector<string> messageCollector,
+        ILogger log)
     {
-        [FunctionName("photo_handle")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+        log.LogInformation("Received a photo upload request.");
+
+        // Check if the container exists and create if it does not
+        await container.CreateIfNotExistsAsync();
+
+        // Assuming the file is sent as a form-data with a 'file' key
+        var file = req.Form.Files.GetFile("file");
+        if (file == null)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
-
-            string name = req.Query["name"];
-
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            string todayDate = DateTime.Today.ToString("yyyy-MM-dd");
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? $"This HTTP triggered function executed successfully on {todayDate}. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully on {todayDate}.";
-
-            return new OkObjectResult(responseMessage);
+            return new BadRequestObjectResult("Please upload a file.");
         }
+
+        // Generate a unique name for the blob
+        string blobName = $"{Guid.NewGuid()}-{file.FileName}";
+        var blockBlob = container.GetBlockBlobReference(blobName);
+
+        // Upload the file to the blob
+        using (var stream = file.OpenReadStream())
+        {
+            await blockBlob.UploadFromStreamAsync(stream);
+        }
+
+        log.LogInformation($"Uploaded blob '{blobName}' to container '{container.Name}'.");
+
+        // Insert a message into the queue to process this blob later
+        await messageCollector.AddAsync(blobName);
+        log.LogInformation($"Enqueued blob name '{blobName}' for further processing.");
+
+        return new OkObjectResult($"File uploaded successfully: {blobName}");
     }
 }
+
+// using System;
+// using System.IO;
+// using System.Threading.Tasks;
+// using Microsoft.AspNetCore.Mvc;
+// using Microsoft.Azure.WebJobs;
+// using Microsoft.Azure.WebJobs.Extensions.Http;
+// using Microsoft.AspNetCore.Http;
+// using Microsoft.Extensions.Logging;
+// using Newtonsoft.Json;
+
+// namespace API1
+// {
+//     public static class photo_handle
+//     {
+//         [FunctionName("photo_handle")]
+//         public static async Task<IActionResult> Run(
+//             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+//             ILogger log)
+//         {
+//             log.LogInformation("C# HTTP trigger function processed a request.");
+
+//             string name = req.Query["name"];
+
+//             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+//             dynamic data = JsonConvert.DeserializeObject(requestBody);
+//             name = name ?? data?.name;
+
+//             string todayDate = DateTime.Today.ToString("yyyy-MM-dd");
+//             string responseMessage = string.IsNullOrEmpty(name)
+//                 ? $"This HTTP triggered function executed successfully on {todayDate}. Pass a name in the query string or in the request body for a personalized response."
+//                 : $"Hello, {name}. This HTTP triggered function executed successfully on {todayDate}.";
+
+//             return new OkObjectResult(responseMessage);
+//         }
+//     }
+// }
