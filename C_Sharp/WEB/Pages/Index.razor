@@ -19,7 +19,8 @@
 
 @code {
     private List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
-    private readonly HttpClient httpClient = new HttpClient(); // This should actually be injected
+    @inject HttpClient httpClient;
+    @inject IConfiguration Configuration; // Inject the IConfiguration service
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
@@ -27,29 +28,32 @@
     }
 
     private async Task UploadFiles()
-{
-    foreach (var file in uploadedFiles)
     {
-        var content = new MultipartFormDataContent();
-        var stream = file.OpenReadStream(10485760); // 10 MB limit here
-        var fileContent = new StreamContent(stream);
+        var photoProcessUrl = Configuration["photo_process_url"]; // Read the Function URL from the configuration
 
-        content.Add(fileContent, "\"file\"", $"\"{file.Name}\"");
-
-        var response = await httpClient.PostAsync("api/API1", content);
-
-        if (response.IsSuccessStatusCode)
+        foreach (var file in uploadedFiles)
         {
-            // Handle the response accordingly.
-        }
-        else
-        {
-            // Error handling
-        }
+            var content = new MultipartFormDataContent();
+            var stream = file.OpenReadStream(10485760); // 10 MB limit here
+            var fileContent = new StreamContent(stream);
 
-        // Make sure to dispose the stream after use
-        await stream.DisposeAsync();
+            content.Add(fileContent, "\"file\"", $"\"{file.Name}\"");
+
+            var response = await httpClient.PostAsync(photoProcessUrl, content); // Use the Function URL
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Handle the response accordingly.
+            }
+            else
+            {
+                // Error handling
+            }
+
+            // Make sure to dispose the stream after use
+            await stream.DisposeAsync();
+        }
     }
 }
 
-}
+
