@@ -1,8 +1,5 @@
 @page "/"
 
-@inject IConfiguration Configuration
-@inject HttpClient httpClient
-
 <PageTitle>Photo Upload</PageTitle>
 
 <h1>Welcome to the Photo Library!</h1>
@@ -22,12 +19,7 @@
 
 @code {
     private List<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
-    private string apiUrl;
-
-    protected override void OnInitialized()
-    {
-        apiUrl = Configuration["photo_process_url"];
-    }
+    private readonly HttpClient httpClient = new HttpClient(); // This should actually be injected
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
@@ -35,37 +27,29 @@
     }
 
     private async Task UploadFiles()
+{
+    foreach (var file in uploadedFiles)
     {
-        foreach (var file in uploadedFiles)
+        var content = new MultipartFormDataContent();
+        var stream = file.OpenReadStream(10485760); // 10 MB limit here
+        var fileContent = new StreamContent(stream);
+
+        content.Add(fileContent, "\"file\"", $"\"{file.Name}\"");
+
+        var response = await httpClient.PostAsync("api/API1", content);
+
+        if (response.IsSuccessStatusCode)
         {
-            var content = new MultipartFormDataContent();
-            using var stream = file.OpenReadStream(10485760); // 10 MB limit here
-            using var fileContent = new StreamContent(stream);
-            content.Add(fileContent, "file", file.Name);
-
-            try
-            {
-                var response = await httpClient.PostAsync(apiUrl, content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    // Handle the response accordingly, maybe indicating success to the user.
-                }
-                else
-                {
-                    // Error handling, maybe indicating the failure to the user.
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                // Log and handle the network-related exception
-            }
-            finally
-            {
-                // The stream is already disposed by the 'using' statement
-            }
+            // Handle the response accordingly.
+        }
+        else
+        {
+            // Error handling
         }
 
-        uploadedFiles.Clear(); // Clear the list after processing all files
+        // Make sure to dispose the stream after use
+        await stream.DisposeAsync();
     }
+}
+
 }
